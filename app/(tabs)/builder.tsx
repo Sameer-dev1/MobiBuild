@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { 
   Layers, 
@@ -22,6 +22,7 @@ import { ComponentLibrary } from '../../components/ComponentLibrary';
 import { PageManager } from '../../components/PageManager';
 import { AuthenticationSetup } from '../../components/AuthenticationSetup';
 import { DragDropBuilder } from '../../components/DragDropBuilder';
+import DraggableFlatList from 'react-native-draggable-flatlist';
 
 export default function Builder() {
   const {
@@ -94,6 +95,17 @@ export default function Builder() {
       default:
         return <ComponentLibrary />;
     }
+  };
+
+  // Handler for drag end
+  const handleDragEnd = ({ data }: { data: typeof pageComponents }) => {
+    // Update the order in the store
+    const newOrderIds = data.map(c => c.id);
+    const reordered = [
+      ...components.filter(c => c.pageId !== currentPageId),
+      ...data
+    ];
+    useAppStore.setState({ components: reordered });
   };
 
   return (
@@ -228,17 +240,80 @@ export default function Builder() {
                   deviceType === 'tablet' && styles.tabletFrame,
                   deviceType === 'desktop' && styles.desktopFrame,
                   orientation === 'landscape' && styles.landscapeFrame,
+                  { flex: 1 },
                 ]}>
                   {currentPage ? (
                     <>
-                      {pageComponents.map((component) => (
-                        <ComponentRenderer
-                          key={component.id}
-                          component={component}
-                          isSelected={selectedComponentId === component.id && !isPreviewMode}
-                          onPress={() => !isPreviewMode && selectComponent(component.id)}
-                        />
-                      ))}
+                      <DraggableFlatList
+                        data={pageComponents}
+                        keyExtractor={item => item.id}
+                        renderItem={({ item, drag, isActive }) => (
+                          <View
+                            style={{
+                              opacity: isActive ? 0.7 : 1,
+                              transform: [{ scale: isActive ? 1.05 : 1 }],
+                              borderWidth: isActive ? 2 : 0,
+                              borderColor: isActive ? '#3B82F6' : 'transparent',
+                              backgroundColor: isActive ? '#E0E7FF' : '#FFF',
+                              marginBottom: 12,
+                              borderRadius: 8,
+                              position: 'relative',
+                              ...(Platform.OS === 'web' && isActive
+                                ? { boxShadow: '0 4px 16px rgba(59,130,246,0.2)' }
+                                : {}),
+                            }}
+                            accessible
+                            accessibilityLabel={`Component ${item.name}`}
+                            accessibilityHint="Long press and drag to reorder"
+                          >
+                            <ComponentRenderer
+                              component={item}
+                              isSelected={selectedComponentId === item.id && !isPreviewMode}
+                              onPress={() => !isPreviewMode && selectComponent(item.id)}
+                              onLongPress={drag}
+                            />
+                            {isActive && (
+                              <Text style={{
+                                position: 'absolute',
+                                top: 4,
+                                right: 8,
+                                color: '#3B82F6',
+                                fontWeight: 'bold',
+                                fontSize: 12,
+                                backgroundColor: '#FFF',
+                                paddingHorizontal: 6,
+                                borderRadius: 4,
+                                zIndex: 10,
+                                borderWidth: 1,
+                                borderColor: '#3B82F6',
+                              }}>
+                                Dragging...
+                              </Text>
+                            )}
+                          </View>
+                        )}
+                        onDragEnd={handleDragEnd}
+                        activationDistance={10}
+                        containerStyle={{ flexGrow: 1 }}
+                        contentContainerStyle={{ paddingBottom: 40 }}
+                        renderPlaceholder={({ item, index }) => (
+                          <View
+                            style={{
+                              height: 60,
+                              backgroundColor: '#DBEAFE',
+                              borderWidth: 2,
+                              borderColor: '#3B82F6',
+                              borderRadius: 8,
+                              marginBottom: 12,
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                            }}
+                          >
+                            <Text style={{ color: '#3B82F6', fontWeight: 'bold' }}>Drop here</Text>
+                          </View>
+                        )}
+                        style={{ flex: 1 }}
+                      />
                       {pageComponents.length === 0 && !isPreviewMode && (
                         <View style={styles.emptyCanvas}>
                           <Layers size={48} color="#9CA3AF" />
@@ -387,11 +462,7 @@ const styles = StyleSheet.create({
   },
   activeDeviceButton: {
     backgroundColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    boxShadow: Platform.OS === 'web' ? '0px 1px 2px rgba(0, 0, 0, 0.1)' : undefined,
   },
   saveButton: {
     backgroundColor: '#10B981',
@@ -484,11 +555,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 20,
     minHeight: 600,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 20,
-    elevation: 12,
+    boxShadow: Platform.OS === 'web' ? '0px 8px 20px rgba(0, 0, 0, 0.15)' : undefined,
   },
   phoneFrame: {
     width: 375,

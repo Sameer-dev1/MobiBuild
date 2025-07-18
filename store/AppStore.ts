@@ -562,10 +562,15 @@ export const useAppStore = create<AppState>()(
         if (currentProject) {
           const updatedProject = {
             ...currentProject,
-            authentication: { ...currentProject.authentication, ...auth },
+            authentication: {
+              ...currentProject.authentication,
+              ...auth,
+              enabled: auth.enabled !== undefined ? auth.enabled : currentProject.authentication?.enabled ?? false,
+              providers: auth.providers !== undefined ? auth.providers : currentProject.authentication?.providers ?? [],
+              protectedPages: auth.protectedPages !== undefined ? auth.protectedPages : currentProject.authentication?.protectedPages ?? [],
+            },
             updatedAt: new Date(),
           };
-          
           set({ currentProject: updatedProject });
         }
       },
@@ -645,6 +650,8 @@ export const useAppStore = create<AppState>()(
 
       // Templates
       loadTemplates: () => {
+        // Generate unique IDs for the template's pages and components
+        const homePageId = generateId();
         const templates: Template[] = [
           {
             id: 'blank',
@@ -664,8 +671,31 @@ export const useAppStore = create<AppState>()(
             description: 'Complete shopping app template',
             category: 'Business',
             thumbnail: 'https://images.pexels.com/photos/230544/pexels-photo-230544.jpeg?auto=compress&cs=tinysrgb&w=400',
-            pages: [createDefaultPage()],
-            components: [],
+            pages: [
+              {
+                id: homePageId,
+                name: 'Home',
+                route: '/home',
+                components: [],
+                layout: 'scroll',
+                backgroundColor: '#FFFFFF',
+                statusBarStyle: 'dark',
+                headerShown: true,
+                tabBarVisible: true,
+                isHomePage: true,
+              },
+            ],
+            components: [
+              {
+                id: generateId(),
+                type: 'text',
+                name: 'Welcome Text',
+                props: { text: 'Welcome to your shop!', fontSize: 24, color: '#1F2937' },
+                pageId: homePageId,
+                parentId: undefined,
+                position: { x: 0, y: 0 },
+              },
+            ],
             settings: defaultProjectSettings,
             theme: defaultTheme,
             tags: ['ecommerce', 'business', 'shopping'],
@@ -685,7 +715,6 @@ export const useAppStore = create<AppState>()(
             featured: true,
           },
         ];
-        
         set({ templates });
       },
 

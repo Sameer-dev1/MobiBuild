@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Smartphone, Tablet, Monitor, RotateCcw, RefreshCw, Play } from 'lucide-react-native';
 import { useAppStore } from '../../store/AppStore';
@@ -273,11 +273,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#000000',
     borderRadius: 20,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 12,
+    ...(Platform.OS === 'web' ? {
+      boxShadow: '0 8px 20px rgba(0, 0, 0, 0.3)',
+    } : {
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.3,
+      shadowRadius: 20,
+      elevation: 12,
+    }),
   },
   statusBar: {
     backgroundColor: '#FFFFFF',

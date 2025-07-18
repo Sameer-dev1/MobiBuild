@@ -8,9 +8,10 @@ interface ComponentRendererProps {
   component: Component;
   isSelected?: boolean;
   onPress?: () => void;
+  onLongPress?: () => void;
 }
 
-export function ComponentRenderer({ component, isSelected, onPress }: ComponentRendererProps) {
+export function ComponentRenderer({ component, isSelected, onPress, onLongPress }: ComponentRendererProps) {
   const { updateComponent } = useAppStore();
 
   const handleInputChange = (value: string) => {
@@ -239,6 +240,7 @@ export function ComponentRenderer({ component, isSelected, onPress }: ComponentR
         isSelected && styles.selectedComponent,
       ]}
       onPress={onPress}
+      onLongPress={onLongPress}
       activeOpacity={0.8}
     >
       {renderComponent()}

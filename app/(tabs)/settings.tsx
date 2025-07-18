@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, TextInput, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, TextInput, Modal, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Settings as SettingsIcon, Download, Database, Palette, Code, Cloud, User, Bell, Shield, CircleHelp as HelpCircle, ExternalLink, Save } from 'lucide-react-native';
 import { useAppStore } from '../../store/AppStore';
@@ -376,11 +376,8 @@ const styles = StyleSheet.create({
     margin: 20,
     padding: 20,
     borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 3,
+    boxShadow: Platform.OS === 'web' ? '0px 2px 8px rgba(0, 0, 0, 0.05)' : undefined,
+    elevation: Platform.OS === 'web' ? 3 : undefined,
   },
   projectTitle: {
     fontSize: 16,
@@ -422,11 +419,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    boxShadow: Platform.OS === 'web' ? '0px 1px 4px rgba(0, 0, 0, 0.05)' : undefined,
+    elevation: Platform.OS === 'web' ? 2 : undefined,
   },
   settingItemContainer: {
     borderBottomWidth: 1,
@@ -497,11 +491,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    boxShadow: Platform.OS === 'web' ? '0px 1px 4px rgba(0, 0, 0, 0.05)' : undefined,
+    elevation: Platform.OS === 'web' ? 2 : undefined,
   },
   configStatus: {
     flexDirection: 'row',
@@ -549,11 +540,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    boxShadow: Platform.OS === 'web' ? '0px 1px 4px rgba(0, 0, 0, 0.05)' : undefined,
+    elevation: Platform.OS === 'web' ? 2 : undefined,
   },
   infoRow: {
     flexDirection: 'row',
